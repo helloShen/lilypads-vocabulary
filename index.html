@@ -4,9 +4,41 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./js/main.js" type="module" defer></script>
+    <link rel="stylesheet" href="./css/main.css">
     <title>Books</title>
 </head>
 <body>
-    
+    <div class="header">
+        <span class="logo">SHEN</div>
+    </div>
+    <div class="main">
+        <div class="card">
+            <div class="title">The Hobbits</div>
+            <div class="author">J. R. R. Tolkien</div>
+            <div class="pages">500</div>
+            <div class="read">not yet read</div>
+            <i class="delete material-icons">delete</i>
+        </div>
+        <div class="card addBook">
+            <i class="material-icons">library_add</i>
+        </div>
+    </div>
+    <form class="addBookForm">
+        <label for="title">Title: </label>
+        <input type="text" name="title" id="title">
+        <label for="author">Author: </label>
+        <input type="text" name="author" id="author">
+        <label for="pages">Pages: </label>
+        <input type="text" name="pages" id="pages">
+        <label for="read">Alread read</label>
+        <input type="checkbox" name="read" id="read">
+        <button class="submitAddBookForm">Add book</button>
+    </form>
+    <div class="footer">
+        <div class="text">
+            copyright © <span class="email">hireme.shen@gmail.com</span>
+        </div>
+    </div>
 </body>
 </html>
