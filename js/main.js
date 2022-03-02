@@ -1,60 +1,46 @@
-import { library  } from "./library.js";
+import { dictionary } from "./dictionary.js";
 
-const addBookBtn = document.querySelector('.addBook');
-const form = document.querySelector('.addBookForm');
-addBookBtn.addEventListener('click', () => {
-    form.style.display = 'block';
-});
+import mustache from "../node_modules/mustache/mustache.mjs";
 
-const main = document.querySelector('div.main');
-function addBookToLibrary(e) {
-    e.preventDefault();
-    const title = form.querySelector('input[id="title"]').value;
-    const author = form.querySelector('input[id="author"]').value;
-    const pages = form.querySelector('input[id="pages"]').value;
-    const read = form.querySelector('input[id="read"]').checked;
-    library.addBook(title, author, pages, read);
-    displayLibrary();
-    form.reset();
-    form.style.display = 'none';
-}
+const template = 
+`
+            <div class="vocabulary">
+                <i class="learned material-icons">check_circle</i>
+                <div class="card">
+                    <div class="text">
+                        <details>
+                            <summary class="word">{{word}}</summary>
+                            <div class="pronounce">{{pronounce}}</div>
+                            {{#meanings}}
+                            <div class="meaning">{{.}}</div>
+                            {{/meanings}}
+                        </details>
+                        <hr>
+                        {{#sentences}}
+                        <div class="sentence">"{{.}}"</div>
+                        {{/sentences}}
+                    </div>
+                    <div class="ctrls">
+                        <i class="important material-icons">star</i>
+                        <i class="delete material-icons">delete</i>
+                    </div>
+                </div>
+            </div>
+`;
 
-const submitAddBookFormBtn = document.querySelector('.submitAddBookForm');
-submitAddBookFormBtn.addEventListener('click', (e) => addBookToLibrary(e));
-
-function insertCard(book) {
-    const card = document.createElement('div');
-    const title = document.createElement('div');
-    const author = document.createElement('div');
-    const pages = document.createElement('div');
-    const read = document.createElement('div');
-    
-    card.classList.add('card');
-    card.dataset['id'] = book.id;
-    title.classList.add('title');
-    author.classList.add('author');
-    pages.classList.add('pages');
-    read.classList.add('read');
-    title.innerHTML = book.title;
-    author.innerHTML = book.author;
-    pages.innerHTML = book.pages;
-    read.innerHTML = book.read;
-    card.appendChild(title);
-    card.appendChild(author);
-    card.appendChild(pages);
-    card.appendChild(read);
-    main.appendChild(card);
-}
-
-const addBook = document.querySelector('.card.addBook');
-function displayLibrary() {
-    clearCards();
-    library.books.forEach((book) => insertCard(book));
-    main.appendChild(addBook);
-}
-
-function clearCards() {
-    const cards = document.querySelectorAll('.card');
+function clear() {
+    const cards = document.querySelectorAll('.vocabulary');
     cards.forEach((card) => card.remove());
 }
 
+function display() {
+    clear();
+    const mid = document.querySelector('.mid');
+    dictionary.vocabularies.forEach((v) => {
+        const card = mustache.render(template, v);
+        mid.insertAdjacentHTML('beforeend', card);
+    });
+}
+
+/* Test */
+display();

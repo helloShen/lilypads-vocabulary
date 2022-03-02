@@ -1,6 +1,10 @@
 @import url('./norm.css');
 
+/* google material icons */
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* google fonts poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
     --black: #000000;
@@ -61,27 +65,154 @@ body {
     padding: 1rem;
     background-color: var(--slate-100);
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-    align-content: start;
+    grid-template-columns: 3fr minmax(30rem, 4fr) 3fr;
+    grid-template-rows: 1fr;
     gap: 1rem;
 }
 
-.card {
-    height: 8rem;
-    background-color: var(--white);
-    border-radius: .5rem;
-    border-left: .5rem solid var(--slate-green-100);
+.left {
+    background-color: var(--gray-500);
 }
 
-.addBook {
+.mid {
+
+}
+
+.addVocabulary {
+    /* style */
+    height: 4rem;
+    border: 1px solid var(--gray-300);
+    border-radius: .5rem;
+    margin: .5rem 0;
+    /* inner layout */
+    display: grid;
+    align-items: center;
+    justify-items: center;
+}
+
+.addVocabulary > i {
+    font-size: 2rem;
+    color: var(--slate-green-100);
+}
+
+.vocabulary {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+}
+
+.material-icons {
+    color: var(--gray-400);
+}
+
+.learned {
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+    margin: .5rem;
+    align-self: center;
+    justify-self: center;
+}
+
+.card {
+    /* style */
+    background-color: var(--white);
+    padding: 1rem;
+    margin: .5rem 0;
+    border-radius: .5rem;
+    border-left: .5rem solid var(--slate-green-100);
+    /* grid layout */
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 2rem;
+    gap: 1rem;
+}
+
+details {
+    margin: .5rem 0;
+}
+
+details > summary {
+    /* style */
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 2rem;
+    color: var(--black);
+    cursor: pointer;
+    /* inner layout */
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: space-between;
+}
+
+details > summary::-webkit-details-marker,
+details > summary::marker {
+    display: none;
+    content: "";
+}
+
+details > summary::after {
+    justify-self: end;
+    content: url("../assets/img/expand_more.svg");
+    transition: transform .1s;
+}
+
+details[open] > summary::after {
+    transform: rotate(180deg);
+    transition: transform .1s;
+}
+
+details > .pronounce,
+details > .meaning {
+    margin: .5rem 1rem;
+    font-family: "poppins" sans-serif;
+    font-size: .75rem;
+    color: var(--gray-500)
+}
+
+details > .pronounce {
+    font-weight: bold;
+}
+
+
+hr {
+    border-top: 1px solid var(--gray-100);
+    margin: .5rem 0;
+}
+
+.sentence {
+    margin: 1rem 0;
+    font-family: "poppins" sans-serif;
+    color: var(--gray-500)
+}
+
+
+.ctrls {
+    /* global layout */
+    grid-row: 2 / span 1;
+    /* inner layout */
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    justify-items: center;
+    justify-content: end;
+}
+
+.ctrls > .material-icons {
+    font-size: 1.5rem;
+    margin: 0 .5rem;
+}
+
+/* .addBook {
     display: grid;
     align-items: center;
     justify-items: center;
     cursor: pointer;
-}
+} */
 
-.addBookForm {
+/* .addBookForm {
     display: none;
+} */
+
+.right {
+    background-color: var(--gray-500);
 }
 
 .footer {
