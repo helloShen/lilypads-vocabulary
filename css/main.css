@@ -114,6 +114,10 @@ body {
     justify-self: center;
 }
 
+.learned.highlight {
+    color: var(--slate-green-100);
+}
+
 .card {
     /* style */
     background-color: var(--white);
@@ -228,6 +232,10 @@ hr {
     font-size: 1.5rem;
     margin: 0 .5rem;
     cursor: pointer;
+}
+
+.ctrls > .important.highlight {
+    color: var(--yellow-400);
 }
 
 .hidden {

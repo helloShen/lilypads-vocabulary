@@ -10,6 +10,13 @@ Dictionary.prototype.getVocabulary = function(vid) {
     return this.vocabularies.find((v) => v.vid == vid);
 }
 
+Dictionary.prototype.removeVocabulary = function(vid) {
+    const idx = this.vocabularies.findIndex((v) => v.vid == vid);
+    if (idx !== -1) {
+        this.vocabularies.splice(idx);
+    }
+}
+
 export function Vocabulary(word, pronounce, meanings, sentences) {
     this.vid = this.getVid();
     this.serial = 0;
@@ -80,8 +87,16 @@ Vocabulary.prototype.toggleLearned = function() {
     this.learned = !this.learned;
 }
 
+Vocabulary.prototype.getLearned = function() {
+    return this.learned;
+}
+
 Vocabulary.prototype.toggleImportant = function() {
     this.important = !this.important;
+}
+
+Vocabulary.prototype.getImportant = function() {
+    return this.important;
 }
 
 export const dictionary = new Dictionary();

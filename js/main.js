@@ -34,7 +34,7 @@ const templateCard =
                     <div class="ctrls">
                         <i data-vid="{{vid}}" class="edit material-icons">edit</i>
                         <i data-vid="{{vid}}" class="important material-icons">star</i>
-                        <i data-vid="{{vid}}" class="delete material-icons">delete</i>
+                        <i data-vid="{{vid}}" class="remove material-icons">delete</i>
                     </div>
                 </div>
             </div>
@@ -49,19 +49,49 @@ const templateEditCard =
                     <label>pronounce</label>
                     <input type="text" name="pronounce" value="{{pronounce}}"></input>
                     {{#meanings}}
-                        <label>meaning</label>
-                        <input type="text" name="meaning" value="{{value}}"> 
+                        <div data-id="{{mid}}" class="wrapper">
+                            <label>meaning</label>
+                            <input type="text" name="meaning" value="{{value}}"> 
+                        </div>
+                        <i data-id="{{mid}}" class="remove material-icons">remove_circle</i>
                     {{/meanings}}
                     <div class="moreMeaning"><i class="material-icons">add_circle</i></div>
                     {{#sentences}}
-                        <label>sentence</label>
-                        <input type="text" name="sentence" value="{{value}}">
+                        <div data-id="{{sid}}" class="wrapper">
+                            <label>sentence</label>
+                            <input type="text" name="sentence" value="{{value}}">
+                        </div>
+                        <i data-id="{{sid}}" class="remove material-icons">remove_circle</i>
                     {{/sentences}}
                     <div class="moreSentence"><i class="material-icons">add_circle</i></div>
                     <button class="submitEditVocabularyForm">Save</button>
                     <button class="cancelEditVocabularyForm">Cancel</button>
                 </form>
             </div>
+`;
+
+const addFormHtml =
+`
+<form data-serial="2" class="addVocabularyForm">
+    <label>word</label>
+    <input type="text" name="word" required>
+    <label>pronounce</label>
+    <input type="text" name="pronounce">
+    <div data-id="1" class="wrapper">
+        <label>meaning</label>
+        <input type="text" name="meaning"> 
+    </div>
+    <i data-id="1" class="remove material-icons">remove_circle</i>
+    <div class="moreMeaning"><i class="material-icons">add_circle</i></div>
+    <div data-id="2" class="wrapper">
+        <label>sentence</label>
+        <input type="text" name="sentence">
+    </div>
+    <i data-id="2" class="remove material-icons">remove_circle</i>
+    <div class="moreSentence"><i class="material-icons">add_circle</i></div>
+    <button class="submitAddVocabularyForm">Save</button>
+    <button class="cancelAddVocabularyForm">Cancel</button>
+</form>
 `;
 
 function clear() {
@@ -71,19 +101,21 @@ function clear() {
     editCards.forEach((card) => card.remove());
 }
 
-function displayAllVocabularies() {
+function displayAllVocabulariesAfter(previous) {
     clear();
-    const addVocab = document.querySelector('.addVocabulary');
     dictionary.vocabularies.forEach((v) => {
-        displaySingleVocabularyAfter(addVocab, v);
+        previous = displaySingleVocabularyAfter(previous, v);
     });
 }
 
+/* render and insert the vocabulary card after the previous element, and return the inserted element. */
 function displaySingleVocabularyAfter(previous, v) {
     const content = mustache.render(templateCard + templateEditCard, v);
     previous.insertAdjacentHTML('afterend', content);
     const vocabCard = document.querySelector(`.vocabulary[data-vid="${v.vid}"]`);
+    const editVocabularyCard = document.querySelector(`.editVocabularyCard[data-vid="${v.vid}"]`);
     initVocabularyControls(vocabCard);
+    return editVocabularyCard;
 }
 
 
@@ -119,60 +151,103 @@ function parseVocabulary(form, vocabulary) {
 function addVocabularyInit() {
     /* toggle add vocabulary form */
     const addBtn = document.querySelector('.addVocabulary > i');
-    const form = document.querySelector('form.addVocabularyForm');
     addBtn.addEventListener('click', () => {
-        form.reset();
-        form.classList.remove('hidden');
+        addBtn.insertAdjacentHTML('afterend', addFormHtml);
+        addBtn.classList.add('hidden');
+        const form = document.querySelector('.addVocabularyForm');
+        /* submit and cancel add vocabulary form */
+        const submit = document.querySelector('button.submitAddVocabularyForm');
+        const cancel = document.querySelector('button.cancelAddVocabularyForm');
+        submit.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            const newVocabulary = parseVocabulary(form);
+            const previous = document.querySelector('.addVocabulary');
+            displaySingleVocabularyAfter(previous, newVocabulary);
+            form.remove();
+            addBtn.classList.remove('hidden');
+        }, false);
+        cancel.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            form.remove();
+            addBtn.classList.remove('hidden');
+        }, false);
+        /* add more meanings and sentences */
+        meaningSentenceControls(form);
     });
-    /* submit and cancel add vocabulary form */
-    const submit = document.querySelector('button.submitAddVocabularyForm');
-    const cancel = document.querySelector('button.cancelAddVocabularyForm');
-    submit.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        const newVocabulary = parseVocabulary(form);
-        const previous = document.querySelector('.addVocabulary');
-        displaySingleVocabularyAfter(previous, newVocabulary);
-        form.reset();
-        form.classList.add('hidden');
-    }, false);
-    cancel.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        form.reset();
-        form.classList.add('hidden');
-    }, false);
-    /* add more meanings and sentences */
-    moreMeaningMoreSentence(form);
 }
 
 /* works in both addVocabularyForm and editVocabularyForm */
-function moreMeaningMoreSentence(form) {
+function meaningSentenceControls(form) {
+    const vocab = dictionary.getVocabulary(form.parentNode.dataset.vid);
     const moreMeaningBtn = form.querySelector('.moreMeaning');
-    const meaningInput = 
-    `
-    <label>meaning</label>
-    <input type="text" name="meaning">
-    `;
     moreMeaningBtn.addEventListener('click', () => {
+        const newMid = (vocab)? 
+            vocab.nextSerial() : 
+            () => ++form.dataset.serial;
+        ;
+        const meaningInput = 
+        `
+        <div data-id="${newMid}" class="wrapper">
+            <label>meaning</label>
+            <input type="text" name="meaning"> 
+        </div>
+        <i data-id="${newMid}" class="remove material-icons">remove_circle</i>
+        `;
         moreMeaningBtn.insertAdjacentHTML('beforebegin', meaningInput);
+        const removeBtn = form.querySelector(`i.remove[data-id="${newMid}"`);
+        const newInput = form.querySelector(`.wrapper[data-id="${newMid}"]`);
+        removeBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            newInput.remove();
+            removeBtn.remove();
+        }, false);
     });
     const moreSentenceBtn = form.querySelector('.moreSentence');
-    const sentenceInput = 
-    `
-    <label>sentence</label>
-    <input type="text" name="sentence"></input>
-    `;
+    
     moreSentenceBtn.addEventListener('click', () => {
+        const newSid = (vocab)? 
+            vocab.nextSerial() : 
+            () => ++form.dataset.serial;
+        ;
+        const sentenceInput = 
+        `
+        <div data-id="${newSid}" class="wrapper">
+            <label>sentence</label>
+            <input type="text" name="sentence">
+        </div>
+        <i data-id="${newSid}" class="remove material-icons">remove_circle</i>
+        `;
         moreSentenceBtn.insertAdjacentHTML('beforebegin', sentenceInput);
+        const removeBtn = form.querySelector(`i.remove[data-id="${newSid}"`);
+        const newInput = form.querySelector(`.wrapper[data-id="${newSid}"]`);
+        removeBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            newInput.remove();
+            removeBtn.remove();
+        }, false);
+    });
+
+    /* bind existing remove button */
+    const existingRemoves = form.querySelectorAll("i.remove");
+    existingRemoves.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            let control = form.querySelector(`.wrapper[data-id="${id}"]`);
+            control.remove();
+            btn.remove();
+        }, false);
     });
 }
 
-function editVocabularyControlInit(control) {
-    const vid = control.dataset.vid;
+function editVocabularyControlInit(vocabCard) {
+    const vid = vocabCard.dataset.vid;
     const vocab = dictionary.getVocabulary(vid);
-    const vocabCard = document.querySelector(`.vocabulary[data-vid="${vid}"]`);
     const vocabEditCard = document.querySelector(`.editVocabularyCard[data-vid="${vid}"`);
+    const control = vocabCard.querySelector('.ctrls > .edit');
     const previous = vocabCard.previousElementSibling;
     control.addEventListener('click', () => {
         /* generate vocabulary editing form */
@@ -186,9 +261,12 @@ function editVocabularyControlInit(control) {
             e.stopPropagation();
             e.preventDefault();
             parseVocabulary(vocabEditForm, vocab);
+            const mark = document.createElement("div.mark");
+            vocabCard.insertAdjacentElement('beforebegin', mark);
             vocabCard.remove();
             vocabEditCard.remove();
-            displaySingleVocabularyAfter(previous, vocab);
+            displaySingleVocabularyAfter(mark, vocab);
+            mark.remove();
         }, false);
         cancel.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -198,19 +276,50 @@ function editVocabularyControlInit(control) {
             vocabEditCard.classList.add('hidden');
         }, false);
         /* add more meanings and sentences */
-        moreMeaningMoreSentence(vocabEditForm);
+        meaningSentenceControls(vocabEditForm);
     });
 }
 
-function initVocabularyControls(vocabularyCard) {
-    const editControl = vocabularyCard.querySelector('.card > .ctrls > .edit');
-    const importantControl = vocabularyCard.querySelector('.card > .ctrls > .important');
-    const removeControl = vocabularyCard.querySelector('.card > .ctrls > .remove');
-    editVocabularyControlInit(editControl);
+function importantControlInit(vocabCard) {
+    const vid = vocabCard.dataset.vid;
+    const vocab = dictionary.getVocabulary(vid);
+    const control = vocabCard.querySelector('.ctrls > .important');
+    if (vocab.getImportant()) control.classList.add('highlight'); 
+    control.addEventListener('click', () => {
+        control.classList.toggle('highlight');
+        vocab.toggleImportant();
+    }, false);
+}
+
+function removeControlInit(vocabCard) {
+    const vid = vocabCard.dataset.vid;
+    const control = vocabCard.querySelector('.ctrls > .remove');
+    control.addEventListener('click', () => {
+        dictionary.removeVocabulary(vid);
+        vocabCard.remove();
+    }, false);
+}
+
+function learnedControlInit(vocabCard) {
+    const vid = vocabCard.dataset.vid;
+    const vocab = dictionary.getVocabulary(vid); 
+    const control = vocabCard.querySelector('.learned');
+    if (vocab.getLearned()) control.classList.add('highlight');
+    control.addEventListener('click', () => {
+        control.classList.toggle('highlight');
+        vocab.toggleLearned();
+    }, false);
+}
+
+function initVocabularyControls(vocabCard) {
+    editVocabularyControlInit(vocabCard);
+    importantControlInit(vocabCard);
+    removeControlInit(vocabCard);
+    learnedControlInit(vocabCard);
 }
 
 
 
 /* main */
 addVocabularyInit();
-displayAllVocabularies();
+displayAllVocabulariesAfter(document.querySelector('.addVocabulary'));
