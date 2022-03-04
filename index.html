@@ -15,7 +15,22 @@
     <div class="main">
         <div class="left"></div>
         <div class="mid">
-            <div class="addVocabulary"><i class="material-icons">add_circle</i></div>
+            <div class="addVocabulary"><i class="material-icons">add_circle</i>
+                <form class="hidden addVocabularyForm">
+                    <label>word</label>
+                    <input type="text" name="word" required>
+                    <label>pronounce</label>
+                    <input type="text" name="pronounce">
+                    <label>meaning</label>
+                    <input type="text" name="meaning">
+                    <div class="moreMeaning"><i class="material-icons">add_circle</i></div>
+                    <label>sentence</label>
+                    <input type="text" name="sentence">
+                    <div class="moreSentence"><i class="material-icons">add_circle</i></div>
+                    <button class="submitAddVocabularyForm">Save</button>
+                    <button class="cancelAddVocabularyForm">Cancel</button>
+                </form>
+            </div>
             <div class="vocabulary">
                 <i class="learned material-icons">check_circle</i>
                 <div class="card">
@@ -38,21 +53,7 @@
             </div>
         </div>
         <div class="right"></div>
-        <!-- <div class="card addBook">
-            <i class="material-icons">library_add</i>
-        </div> -->
     </div>
-    <!-- <form class="addBookForm">
-        <label for="title">Title: </label>
-        <input type="text" name="title" id="title">
-        <label for="author">Author: </label>
-        <input type="text" name="author" id="author">
-        <label for="pages">Pages: </label>
-        <input type="text" name="pages" id="pages">
-        <label for="read">Alread read</label>
-        <input type="checkbox" name="read" id="read">
-        <button class="submitAddBookForm">Add book</button>
-    </form> -->
     <div class="footer">
         <div class="text">
             copyright © <span class="email">hireme.shen@gmail.com</span>

@@ -6,35 +6,86 @@ Dictionary.prototype.add = function(v) {
     this.vocabularies.push(v);
 }
 
-function Vocabulary(word, pronounce, meaning, sentence) {
-    this.id = this.getId();
-    this.word = word;
-    this.pronounce = pronounce;
-    this.meanings = [];
-    this.sentences = [];
-    if (meaning) {
-        if (Array.isArray(meaning)) {
-            this.meanings = meaning;
-        } else {
-            this.meanings.push(meaning);
-        }
-    }
-    if (sentence) {
-        if (Array.isArray(sentence)) {
-            this.sentences = sentence;
-        } else {
-            this.sentences.push(sentence);
-        }
-    }
-    this.learned = false;
-    this.important = false;
+Dictionary.prototype.getVocabulary = function(vid) {
+    return this.vocabularies.find((v) => v.vid == vid);
 }
 
-Vocabulary.prototype.getId = function() {
+export function Vocabulary(word, pronounce, meanings, sentences) {
+    this.vid = this.getVid();
+    this.serial = 0;
+    this.learned = false;
+    this.important = false;
+    this.setWord(word);
+    this.setPronounce(pronounce);
+    this.setMeanings(meanings);
+    this.setSentences(sentences);
+}
+
+Vocabulary.prototype.getVid = function() {
     const millis = Date.now();
-    const randomInt = Math.floor(Math.random() * 1000);
-    return millis * 1000 + randomInt;
+    const randomInt = Math.floor(Math.random() * 1000000);
+    return millis * 1000000 + randomInt;
 };
+
+Vocabulary.prototype.nextSerial = function() {
+    this.serial += 1;
+    return this.serial;
+}
+
+Vocabulary.prototype.getWord = function() {
+    return this.word;
+}
+
+Vocabulary.prototype.setWord = function(word) {
+    this.word = word;
+}
+
+Vocabulary.prototype.getPronounce = function() {
+    return this.pronounce;
+}
+
+Vocabulary.prototype.setPronounce = function(pronounce) {
+    this.pronounce = pronounce;
+}
+
+Vocabulary.prototype.getMeanings = function() {
+    return this.meanings;
+}
+
+/* meanings must be an array */
+Vocabulary.prototype.setMeanings = function(meanings) {
+    this.meanings = [];
+    if (meanings && Array.isArray(meanings)) {
+        meanings.forEach((meaning) => {
+            this.meanings.push({mid: this.nextSerial(), value: meaning});
+        });
+    }
+}
+
+Vocabulary.prototype.getSentence = function() {
+    return this.sentences;
+}
+
+/* sentences must be an array */
+Vocabulary.prototype.setSentences = function(sentences) {
+    this.sentences = [];
+    if (sentences && Array.isArray(sentences)) {
+        sentences.forEach((sentence) => {
+            this.sentences.push({sid: this.nextSerial(), value: sentence});
+        });
+    }
+}
+
+Vocabulary.prototype.toggleLearned = function() {
+    this.learned = !this.learned;
+}
+
+Vocabulary.prototype.toggleImportant = function() {
+    this.important = !this.important;
+}
+
+export const dictionary = new Dictionary();
+
 
 
 /* Test */
@@ -55,9 +106,8 @@ console.log(abandon);
 
 const abashed = new Vocabulary('abashed', '', ['embarrassed, disconcerted, or ashamed.'], ['she was not abashed at being caught']);
 
-export const dictionary = new Dictionary();
 dictionary.add(abandon);
 dictionary.add(abashed);
-console.log(dictionary);
+// console.log(dictionary);
 
 

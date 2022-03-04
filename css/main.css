@@ -80,7 +80,7 @@ body {
 
 .addVocabulary {
     /* style */
-    height: 4rem;
+    min-height: 4rem;
     border: 1px solid var(--gray-300);
     border-radius: .5rem;
     margin: .5rem 0;
@@ -88,11 +88,13 @@ body {
     display: grid;
     align-items: center;
     justify-items: center;
+    user-select: none;
 }
 
 .addVocabulary > i {
     font-size: 2rem;
     color: var(--slate-green-100);
+    cursor: pointer;
 }
 
 .vocabulary {
@@ -149,7 +151,7 @@ details > summary::marker {
 }
 
 details > summary::after {
-    justify-self: end;
+    /* justify-self: end; */
     content: url("../assets/img/expand_more.svg");
     transition: transform .1s;
 }
@@ -164,7 +166,8 @@ details > .meaning {
     margin: .5rem 1rem;
     font-family: "poppins" sans-serif;
     font-size: .75rem;
-    color: var(--gray-500)
+    color: var(--gray-500);
+    pointer-events: none;
 }
 
 details > .pronounce {
@@ -178,11 +181,37 @@ hr {
 }
 
 .sentence {
-    margin: 1rem 0;
+    padding: .5rem;
+    margin: .5rem 0;
     font-family: "poppins" sans-serif;
-    color: var(--gray-500)
+    color: var(--white);
+    background-color: var(--slate-green-100);
+    border-radius: .25rem;
 }
 
+.meaning > i {
+    font-size: 1em;
+    text-align: center;
+    margin: 0 .5em;
+    color: var(--slate-green-100);
+    display: none;
+}
+
+.meaning > i.visable {
+    display: inline;
+}
+
+.sentence > i {
+    font-size: 1em;
+    text-align: center;
+    margin: 0 .5em;
+    color: var(--white);
+    display: none;
+}
+
+.sentence > i.visable {
+    display: inline;
+}
 
 .ctrls {
     /* global layout */
@@ -198,18 +227,17 @@ hr {
 .ctrls > .material-icons {
     font-size: 1.5rem;
     margin: 0 .5rem;
+    cursor: pointer;
 }
 
-/* .addBook {
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    cursor: pointer;
-} */
-
-/* .addBookForm {
+.hidden {
     display: none;
-} */
+}
+
+i {
+    user-select: none;
+    cursor: pointer;
+}
 
 .right {
     background-color: var(--gray-500);
