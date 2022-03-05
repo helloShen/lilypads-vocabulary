@@ -1,7 +1,8 @@
 import { Vocabulary } from "./dictionary.js";
 import { dictionary } from "./dictionary.js";
 
-import mustache from "../node_modules/mustache/mustache.mjs";
+// import mustache from "../node_modules/mustache/mustache.mjs";
+import mustache from "./mustache.mjs";
 
 const templateCard = 
 `
