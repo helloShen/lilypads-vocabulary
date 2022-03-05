@@ -1,5 +1,6 @@
 import { Vocabulary } from "./dictionary.js";
 import { dictionary } from "./dictionary.js";
+import { formFloating } from "./formFloating.js";
 
 // import mustache from "../node_modules/mustache/mustache.mjs";
 import mustache from "./mustache.mjs";
@@ -43,7 +44,7 @@ const templateCard =
 
 const templateEditCard =
 `
-        <div data-vid="{{vid}}" class="formCard editVocabularyCard hidden">
+        <div data-vid="{{vid}}" class="formCard editVocabularyCard">
             <form class="editVocabularyForm">
                 <div class="form-floating">
                     <input type="text" name="word" class="form-control" value="{{word}}" required>
@@ -116,24 +117,46 @@ function clear() {
     editCards.forEach((card) => card.remove());
 }
 
-function displayAllVocabulariesAfter(previous) {
+function displayAllVocabulariesAfter(marker) {
     clear();
     dictionary.vocabularies.forEach((v) => {
-        previous = displaySingleVocabularyAfter(previous, v);
+        marker = displaySingleVocabularyAfter(marker, v);
     });
 }
 
-/* render and insert the vocabulary card after the previous element, and return the inserted element. */
-function displaySingleVocabularyAfter(previous, v) {
-    const content = mustache.render(templateCard + templateEditCard, v);
-    previous.insertAdjacentHTML('afterend', content);
+/* render and insert the vocabulary card right before the mark element, and return the inserted element. */
+function displaySingleVocabularyBefore(marker, v) {
+    const content = mustache.render(templateCard, v);
+    marker.insertAdjacentHTML('beforebegin', content);
     const vocabCard = document.querySelector(`.vocabulary[data-vid="${v.vid}"]`);
-    const editVocabularyCard = document.querySelector(`.editVocabularyCard[data-vid="${v.vid}"]`);
     initVocabularyControls(vocabCard);
-    return editVocabularyCard;
+    return vocabCard;
 }
 
+/* render and insert the vocabulary card after the marker element, and return the inserted element. */
+function displaySingleVocabularyAfter(marker, v) {
+    const content = mustache.render(templateCard, v);
+    marker.insertAdjacentHTML('afterend', content);
+    const vocabCard = document.querySelector(`.vocabulary[data-vid="${v.vid}"]`);
+    initVocabularyControls(vocabCard);
+    return vocabCard;
+}
 
+/* render and insert the vocabulary edit card right before the mark element, and return the inserted element. */
+function displayVocabularyEditCardBefore(marker, v) {
+    const content = mustache.render(templateEditCard, v);
+    marker.insertAdjacentHTML('beforebegin', content);
+    const editVocabCard = document.querySelector(`.editVocabularyCard[data-vid="${v.vid}"]`);
+    return editVocabCard;
+}
+
+/* render and insert the vocabulary edit card after the marker element, and return the inserted element. */
+function displayVocabularyEditCardAfter(marker, v) {
+    const content = mustache.render(templateEditCard, v);
+    marker.insertAdjacentHTML('afterend', content);
+    const editVocabCard = document.querySelector(`.editVocabularyCard[data-vid="${v.vid}"]`);
+    return editVocabCard;
+}
 
 /* if argument >= 2, update the original vocabulary.
  * otherwise, create a new vocabulary, and insert it into the dictionary. */
@@ -168,19 +191,24 @@ function addVocabularyInit() {
     const addDiv = document.querySelector('.addVocabulary');
     const addBtn = addDiv.querySelector('i');
     addBtn.addEventListener('click', () => {
-        addDiv.insertAdjacentHTML('beforebegin', addFormHtml);
+        /* generating the add vocabulary form by template */
         addDiv.classList.add('hidden');
+        addDiv.insertAdjacentHTML('beforebegin', addFormHtml);
         const card = document.querySelector('.addVocabularyCard');
-        const form = card.querySelector('.addVocabularyForm');
+        /* floating input style */
+        formFloating.initAll(card);
+        /* bind remove buttons */
+        bindExistingRemoveBtn(card);
+        /* add more meanings and sentences */
+        meaningSentenceControls(card);
         /* submit and cancel add vocabulary form */
-        const submit = form.querySelector('button.submitAddVocabularyForm');
-        const cancel = form.querySelector('button.cancelAddVocabularyForm');
+        const submit = card.querySelector('button.submitAddVocabularyForm');
+        const cancel = card.querySelector('button.cancelAddVocabularyForm');
         submit.addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
-            const newVocabulary = parseVocabulary(form);
-            const previous = addDiv;
-            displaySingleVocabularyAfter(previous, newVocabulary);
+            const newVocabulary = parseVocabulary(card);
+            displaySingleVocabularyAfter(addDiv, newVocabulary);
             card.remove();
             addDiv.classList.remove('hidden');
         }, false);
@@ -190,128 +218,115 @@ function addVocabularyInit() {
             card.remove();
             addDiv.classList.remove('hidden');
         }, false);
-        /* floating input style */
-        const floatings = card.querySelectorAll('.form-floating');
-        floatings.forEach((floating) => {
-            floatingInputInit(floating);
-        });
-        /* add more meanings and sentences */
-        meaningSentenceControls(form);
     });
 }
 
-/* works in both addVocabularyForm and editVocabularyForm */
-function meaningSentenceControls(form) {
-    const vocab = dictionary.getVocabulary(form.parentNode.dataset.vid);
-    const moreMeaningBtn = form.querySelector('.moreMeaning');
-    moreMeaningBtn.addEventListener('click', () => {
-        let newMid = '';
-        if (vocab) {
-            newMid = vocab.nextSerial();
-        } else {
-            form.dataset.serial += 1;
-            newMid = form.dataset.serial;
-        }
-        const meaningInput = 
-        `
-        <div data-id="${newMid}" class="wrapper form-floating">
-            <input type="text" name="meaning" class="form-control"> 
-            <label>meaning</label>
-            <i data-id="${newMid}" class="remove material-icons">remove_circle</i>
-        </div>
-        `;
-        moreMeaningBtn.insertAdjacentHTML('beforebegin', meaningInput);
-        const removeBtn = form.querySelector(`i.remove[data-id="${newMid}"`);
-        const newInput = form.querySelector(`.wrapper[data-id="${newMid}"]`);
-        removeBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            newInput.remove();
-            removeBtn.remove();
-        }, false);
-        floatingInputInit(newInput);
-    });
-    const moreSentenceBtn = form.querySelector('.moreSentence');
-    
-    moreSentenceBtn.addEventListener('click', () => {
-        let newSid = '';
-        if (vocab) {
-            newSid = vocab.nextSerial();
-        } else {
-            form.dataset.serial += 1;
-            newSid = form.dataset.serial;
-        }
-        const sentenceInput = 
-        `
-        <div data-id="${newSid}" class="wrapper form-floating">
-            <input type="text" name="sentence" class="form-control">
-            <label>sentence</label>
-            <i data-id="${newSid}" class="remove material-icons">remove_circle</i>
-        </div>
-        `;
-        moreSentenceBtn.insertAdjacentHTML('beforebegin', sentenceInput);
-        const removeBtn = form.querySelector(`i.remove[data-id="${newSid}"`);
-        const newInput = form.querySelector(`.wrapper[data-id="${newSid}"]`);
-        removeBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            newInput.remove();
-            removeBtn.remove();
-        }, false);
-        floatingInputInit(newInput);
-    });
+const meaningInputTemplate = 
+`
+<div data-id="{{id}}" class="wrapper form-floating">
+    <input type="text" name="meaning" class="form-control"> 
+    <label>meaning</label>
+    <i data-id="{{id}}" class="remove material-icons">remove_circle</i>
+</div>
+`;
 
-    /* bind existing remove button */
+const sentenceInputTemplate = 
+`
+<div data-id="{{id}}" class="wrapper form-floating">
+    <input type="text" name="sentence" class="form-control">
+    <label>sentence</label>
+    <i data-id="{{id}}" class="remove material-icons">remove_circle</i>
+</div>
+`;
+
+/* the "form" argument can be the form itself or its wrapper card div */
+function getIdFromForm(form) {
+    /* if a vocabulary is bind to this form, use the serial in the vocabulary object. */
+    let vid = form.dataset.vid;
+    if (!vid) vid = form.parentNode.dataset.vid;
+    const vocab = dictionary.getVocabulary(vid);
+    if (vocab) return vocab.nextSerial();
+    /* otherwise, use the "data-serial" attribute of the form */
+    if (form.dataset.serial) return ++form.dataset.serial;
+    return ++form.children[0].dataset.serial;
+}
+
+/* add event listener to a single remove button */
+function bindRemoveBtn(removeBtn, inputForm) {
+    removeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        inputForm.remove();
+        removeBtn.remove();
+    }, false);
+}
+
+/* bind all existing remove button in certain form */
+function bindExistingRemoveBtn(form) {
     const existingRemoves = form.querySelectorAll("i.remove");
     existingRemoves.forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const id = btn.dataset.id;
-            let control = form.querySelector(`.wrapper[data-id="${id}"]`);
-            control.remove();
-            btn.remove();
-        }, false);
+        const id = btn.dataset.id;
+        let control = form.querySelector(`.wrapper[data-id="${id}"]`);
+        bindRemoveBtn(btn, control);
     });
+}
+
+/* create an form input control and insert it before the marker */
+function createInput(form, template, marker) {
+    /* genereate element from template */
+    const data = {id: getIdFromForm(form)};
+    const inputContent = mustache.render(template, data);
+    marker.insertAdjacentHTML('beforebegin', inputContent);
+    /* binding event listeners to remove button */
+    const removeBtn = form.querySelector(`i.remove[data-id="${data.id}"`);
+    const newInput = form.querySelector(`.wrapper[data-id="${data.id}"]`);
+    bindRemoveBtn(removeBtn, newInput);
+    /* initialize floating sytle */
+    formFloating.init(newInput);
+}
+
+/* add more meaning and sentence 
+ * works in both addVocabularyForm and editVocabularyForm */
+function meaningSentenceControls(form) {
+    /* one more meaning */
+    const moreMeaningBtn = form.querySelector('.moreMeaning');
+    moreMeaningBtn.addEventListener('click', () => createInput(form, meaningInputTemplate, moreMeaningBtn));
+    /* one more sentence */
+    const moreSentenceBtn = form.querySelector('.moreSentence');
+    moreSentenceBtn.addEventListener('click', () => createInput(form, sentenceInputTemplate, moreSentenceBtn));
 }
 
 function editVocabularyControlInit(vocabCard) {
     const vid = vocabCard.dataset.vid;
     const vocab = dictionary.getVocabulary(vid);
-    const vocabEditCard = document.querySelector(`.editVocabularyCard[data-vid="${vid}"`);
     const control = vocabCard.querySelector('.ctrls > .edit');
-    const previous = vocabCard.previousElementSibling;
     control.addEventListener('click', () => {
-        /* generate vocabulary editing form */
         vocabCard.classList.add('hidden');
-        vocabEditCard.classList.remove('hidden');
+        /* generate vocabulary editing form */
+        const vocabEditCard = displayVocabularyEditCardAfter(vocabCard, vocab);
+        /* floating input style */
+        formFloating.initAll(vocabEditCard);
+        /* bind remove buttons */
+        bindExistingRemoveBtn(vocabEditCard);
+        /* add more meanings and sentences */
+        meaningSentenceControls(vocabEditCard);
         /* activate submit and cancel button */
-        const vocabEditForm = vocabEditCard.querySelector(`.editVocabularyForm`)
-        const submit = vocabEditForm.querySelector('button.submitEditVocabularyForm');
-        const cancel = vocabEditForm.querySelector('button.cancelEditVocabularyForm');
+        const submit = vocabEditCard.querySelector('button.submitEditVocabularyForm');
+        const cancel = vocabEditCard.querySelector('button.cancelEditVocabularyForm');
         submit.addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
-            parseVocabulary(vocabEditForm, vocab);
-            const mark = document.createElement("div.mark");
-            vocabCard.insertAdjacentElement('beforebegin', mark);
+            parseVocabulary(vocabEditCard, vocab);
+            displaySingleVocabularyBefore(vocabCard, vocab);
             vocabCard.remove();
             vocabEditCard.remove();
-            displaySingleVocabularyAfter(mark, vocab);
-            mark.remove();
         }, false);
         cancel.addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
             vocabCard.classList.remove('hidden');
-            vocabEditForm.reset();
-            vocabEditCard.classList.add('hidden');
+            vocabEditCard.remove();
         }, false);
-        /* floating input style */
-        const floatings = vocabEditCard.querySelectorAll('.form-floating');
-        floatings.forEach((floating) => {
-            floatingInputInit(floating);
-        });
-        /* add more meanings and sentences */
-        meaningSentenceControls(vocabEditForm);
     });
 }
 
@@ -332,8 +347,6 @@ function removeControlInit(vocabCard) {
     control.addEventListener('click', () => {
         dictionary.removeVocabulary(vid);
         vocabCard.remove();
-        const editVocabCard = document.querySelector(`.editVocabularyCard[data-vid="${vid}"]`);
-        editVocabCard.remove();
     }, false);
 }
 
@@ -353,26 +366,6 @@ function initVocabularyControls(vocabCard) {
     importantControlInit(vocabCard);
     removeControlInit(vocabCard);
     learnedControlInit(vocabCard);
-}
-
-/* Check if the form-control element is empty before losing focus (user switch to another section). 
- * If not empty, keep the floating style. */
-function checkEmpty(control) {
-    const content = control.value;
-    if (content) {
-        control.classList.add('notEmpty');
-    } else {
-        control.classList.remove('notEmpty');
-    }
-}
-
-/* Bind listener for form-floating element. */
-function floatingInputInit(floating) {
-    const control = floating.querySelector('.form-control');
-    checkEmpty(control);
-    control.addEventListener('blur', () => {
-        checkEmpty(control);
-    }, false);
 }
 
 
