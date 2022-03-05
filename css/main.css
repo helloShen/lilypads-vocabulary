@@ -23,6 +23,7 @@
     --slate-green-100: #2FBA98;
     --slate-green-300: #00929A;
     --slate-green-500: #1F6881;
+    --slate-orange: #FB864D;
 
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
@@ -70,14 +71,6 @@ body {
     gap: 1rem;
 }
 
-.left {
-    background-color: var(--gray-500);
-}
-
-.mid {
-
-}
-
 .addVocabulary {
     /* style */
     min-height: 4rem;
@@ -97,6 +90,10 @@ body {
     cursor: pointer;
 }
 
+.addVocabulary > i:hover {
+    color: var(--slate-green-300);
+}
+
 .vocabulary {
     display: grid;
     grid-template-columns: 2.5rem 1fr;
@@ -114,6 +111,10 @@ body {
     justify-self: center;
 }
 
+.learned:hover {
+    color: var(--gray-700);
+}
+
 .learned.highlight {
     color: var(--slate-green-100);
 }
@@ -125,11 +126,12 @@ body {
     margin: .5rem 0;
     border-radius: .5rem;
     border-left: .5rem solid var(--slate-green-100);
+    box-shadow: 2px 2px 4px var(--gray-300);
     /* grid layout */
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 2rem;
-    gap: 1rem;
+    gap: .5rem;
 }
 
 details {
@@ -139,13 +141,17 @@ details {
 details > summary {
     /* style */
     font-family: 'Times New Roman', Times, serif;
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: var(--black);
     cursor: pointer;
     /* inner layout */
     display: grid;
     grid-auto-flow: column;
     justify-content: space-between;
+}
+
+details > summary:hover {
+    background-color: #2FBA9822;
 }
 
 details > summary::-webkit-details-marker,
@@ -185,12 +191,10 @@ hr {
 }
 
 .sentence {
-    padding: .5rem;
     margin: .5rem 0;
     font-family: "poppins" sans-serif;
-    color: var(--white);
-    background-color: var(--slate-green-100);
     border-radius: .25rem;
+    font-size: .8rem;
 }
 
 .meaning > i {
@@ -234,6 +238,10 @@ hr {
     cursor: pointer;
 }
 
+.ctrls > .material-icons:hover {
+    color: var(--gray-700);
+}
+
 .ctrls > .important.highlight {
     color: var(--yellow-400);
 }
@@ -247,8 +255,117 @@ i {
     cursor: pointer;
 }
 
-.right {
-    background-color: var(--gray-500);
+.formCard {
+    font-size: .75rem;
+    background-color: var(--white);
+    padding: 1rem;
+    margin: .5rem 0;
+    border-radius: .5rem;
+    border-left: .5rem solid var(--slate-green-100);
+    box-shadow: 2px 2px 4px var(--gray-300);
+}
+
+.form-control {
+    width: calc(100% - 2.5rem);
+    height: 3rem;
+    line-height: 1.25;
+    padding-top: 1.25rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    border: 1px solid var(--gray-300);
+    color: var(--slate-700);
+}
+
+.form-control:focus {
+    outline: 0;
+}
+
+.form-floating {
+    position: relative;
+}
+
+.form-floating > label {
+    position: absolute;
+    line-height: 1;
+    font-size: .8rem;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding: 1rem 0.75rem;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.form-floating > i.remove {
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    right: 1rem;
+    top: 1rem;
+}
+
+.form-floating > i.remove:hover {
+    color: var(--slate-orange);
+}
+
+.form-floating > .form-control.notEmpty + label,
+.form-floating > .form-control:focus + label {
+    opacity: 0.4;
+    transform: scale(0.8) translateY(-0.5rem) translateX(0.25rem);
+    transform-origin: 0 0;
+}
+
+.moreMeaning,
+.moreSentence {
+    width: calc(100% - 2.5rem);
+    margin: .5rem 0;
+    padding: .5rem 1rem;
+    background-color: var(--slate-green-100);
+    color: var(--white);
+    cursor: pointer;
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+}
+
+.moreMeaning:hover,
+.moreSentence:hover {
+    background-color: var(--slate-green-300);
+}
+
+.moreMeaning > i,
+.moreSentence > i {
+    margin: 0 .5rem;
+    color: var(--white);
+}
+
+form button {
+    font-size: 1rem;
+    width: 5rem;
+    padding: .5rem 1rem;
+    margin: 1rem 0;
+    border: 0;
+    border-radius: .25rem;
+    background-color: var(--slate-green-100);
+    color: var(--white);
+    cursor: pointer;
+}
+
+form button:hover,
+form button:hover {
+    background-color: var(--slate-green-300);
+}
+
+form .btns {
+    width: calc(100% - 2.5rem);
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-evenly;
 }
 
 .footer {

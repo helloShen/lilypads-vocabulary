@@ -121,8 +121,20 @@ console.log(abandon);
 
 const abashed = new Vocabulary('abashed', '', ['embarrassed, disconcerted, or ashamed.'], ['she was not abashed at being caught']);
 
+const abate = new Vocabulary('abate', "[ə'beit]", [`
+(of something perceived as hostile, threatening, or negative) become less intense or widespread`], [`
+this action would not have been sufficient to abate the odor nuisance`]);
+
+const abdicate = new Vocabulary('abdicate', "[æbdi'keit]", [`(of a monarch) renounce one's throne.`, `fail to fulfill or undertake (a responsibility or duty).`], [`in 1918 Kaiser Wilhelm abdicated as German emperor`, `the secretary of state should not abdicate from leadership on educational issues`]);
+
+const abduct = new Vocabulary('abduct', "[æb'dʌkt]", [`take (someone) away illegally by force or deception; kidnap.`, `(of a muscle) move (a limb or part) away from the midline of the body or from another part.`], [`the millionaire who disappeared may have been abducted
+`, `the posterior rectus muscle, which abducts the eye`]);
+
 dictionary.add(abandon);
 dictionary.add(abashed);
+dictionary.add(abate);
+dictionary.add(abdicate);
+dictionary.add(abduct);
 // console.log(dictionary);
 
 

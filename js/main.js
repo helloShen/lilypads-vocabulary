@@ -42,56 +42,70 @@ const templateCard =
 
 const templateEditCard =
 `
-            <div data-vid="{{vid}}" class="card editVocabularyCard hidden">
-                <form class="editVocabularyForm">
+        <div data-vid="{{vid}}" class="formCard editVocabularyCard hidden">
+            <form class="editVocabularyForm">
+                <div class="form-floating">
+                    <input type="text" name="word" class="form-control" value="{{word}}" required>
                     <label>word</label>
-                    <input type="text" name="word" value="{{word}}" required>
+                </div>
+                <div class="form-floating">
+                    <input type="text" name="pronounce" class="form-control" value="{{pronounce}}"></input>
                     <label>pronounce</label>
-                    <input type="text" name="pronounce" value="{{pronounce}}"></input>
-                    {{#meanings}}
-                        <div data-id="{{mid}}" class="wrapper">
-                            <label>meaning</label>
-                            <input type="text" name="meaning" value="{{value}}"> 
-                        </div>
+                </div>
+                {{#meanings}}
+                    <div data-id="{{mid}}" class="form-floating wrapper">
+                        <input type="text" name="meaning" class="form-control" value="{{value}}"> 
+                        <label>meaning</label>
                         <i data-id="{{mid}}" class="remove material-icons">remove_circle</i>
-                    {{/meanings}}
-                    <div class="moreMeaning"><i class="material-icons">add_circle</i></div>
-                    {{#sentences}}
-                        <div data-id="{{sid}}" class="wrapper">
-                            <label>sentence</label>
-                            <input type="text" name="sentence" value="{{value}}">
-                        </div>
+                    </div>
+                {{/meanings}}
+                <div class="moreMeaning"><i class="material-icons">add_circle</i>Add Meaning</div>
+                {{#sentences}}
+                    <div data-id="{{sid}}" class="wrapper form-floating">
+                        <input type="text" name="sentence" class="form-control" value="{{value}}">
+                        <label>sentence</label>
                         <i data-id="{{sid}}" class="remove material-icons">remove_circle</i>
-                    {{/sentences}}
-                    <div class="moreSentence"><i class="material-icons">add_circle</i></div>
+                    </div>
+                {{/sentences}}
+                <div class="moreSentence"><i class="material-icons">add_circle</i>Add Sentence</div>
+                <div class="btns">
                     <button class="submitEditVocabularyForm">Save</button>
                     <button class="cancelEditVocabularyForm">Cancel</button>
-                </form>
-            </div>
+                </div>
+            </form>
+        </div>
 `;
 
 const addFormHtml =
 `
-<form data-serial="2" class="addVocabularyForm">
-    <label>word</label>
-    <input type="text" name="word" required>
-    <label>pronounce</label>
-    <input type="text" name="pronounce">
-    <div data-id="1" class="wrapper">
-        <label>meaning</label>
-        <input type="text" name="meaning"> 
-    </div>
-    <i data-id="1" class="remove material-icons">remove_circle</i>
-    <div class="moreMeaning"><i class="material-icons">add_circle</i></div>
-    <div data-id="2" class="wrapper">
-        <label>sentence</label>
-        <input type="text" name="sentence">
-    </div>
-    <i data-id="2" class="remove material-icons">remove_circle</i>
-    <div class="moreSentence"><i class="material-icons">add_circle</i></div>
-    <button class="submitAddVocabularyForm">Save</button>
-    <button class="cancelAddVocabularyForm">Cancel</button>
-</form>
+<div class="formCard addVocabularyCard">
+    <form data-serial="2" class="addVocabularyForm">
+        <div class="form-floating">
+            <input type="text" name="word" class="form-control" required>
+            <label>word</label>
+        </div>
+        <div class="form-floating">
+            <input type="text" name="pronounce" class="form-control">
+            <label>pronounce</label>
+        </div>
+        <div data-id="1" class="wrapper form-floating">
+            <input type="text" name="meaning" class="form-control"> 
+            <label>meaning</label>
+            <i data-id="1" class="remove material-icons">remove_circle</i>
+        </div>
+        <div class="moreMeaning"><i class="material-icons">add_circle</i>Add Meaning</div>
+        <div data-id="2" class="wrapper form-floating">
+            <input type="text" name="sentence" class="form-control">
+            <label>sentence</label>
+            <i data-id="2" class="remove material-icons">remove_circle</i>
+        </div>
+        <div class="moreSentence"><i class="material-icons">add_circle</i>Add Sentence</div>
+        <div class="btns">
+            <button class="submitAddVocabularyForm">Save</button>
+            <button class="cancelAddVocabularyForm">Cancel</button>
+        </div>
+    </form>
+</div>
 `;
 
 function clear() {
@@ -150,29 +164,36 @@ function parseVocabulary(form, vocabulary) {
 
 function addVocabularyInit() {
     /* toggle add vocabulary form */
-    const addBtn = document.querySelector('.addVocabulary > i');
+    const addDiv = document.querySelector('.addVocabulary');
+    const addBtn = addDiv.querySelector('i');
     addBtn.addEventListener('click', () => {
-        addBtn.insertAdjacentHTML('afterend', addFormHtml);
-        addBtn.classList.add('hidden');
-        const form = document.querySelector('.addVocabularyForm');
+        addDiv.insertAdjacentHTML('beforebegin', addFormHtml);
+        addDiv.classList.add('hidden');
+        const card = document.querySelector('.addVocabularyCard');
+        const form = card.querySelector('.addVocabularyForm');
         /* submit and cancel add vocabulary form */
-        const submit = document.querySelector('button.submitAddVocabularyForm');
-        const cancel = document.querySelector('button.cancelAddVocabularyForm');
+        const submit = form.querySelector('button.submitAddVocabularyForm');
+        const cancel = form.querySelector('button.cancelAddVocabularyForm');
         submit.addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
             const newVocabulary = parseVocabulary(form);
-            const previous = document.querySelector('.addVocabulary');
+            const previous = addDiv;
             displaySingleVocabularyAfter(previous, newVocabulary);
-            form.remove();
-            addBtn.classList.remove('hidden');
+            card.remove();
+            addDiv.classList.remove('hidden');
         }, false);
         cancel.addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
-            form.remove();
-            addBtn.classList.remove('hidden');
+            card.remove();
+            addDiv.classList.remove('hidden');
         }, false);
+        /* floating input style */
+        const floatings = card.querySelectorAll('.form-floating');
+        floatings.forEach((floating) => {
+            floatingInputInit(floating);
+        });
         /* add more meanings and sentences */
         meaningSentenceControls(form);
     });
@@ -183,17 +204,20 @@ function meaningSentenceControls(form) {
     const vocab = dictionary.getVocabulary(form.parentNode.dataset.vid);
     const moreMeaningBtn = form.querySelector('.moreMeaning');
     moreMeaningBtn.addEventListener('click', () => {
-        const newMid = (vocab)? 
-            vocab.nextSerial() : 
-            () => ++form.dataset.serial;
-        ;
+        let newMid = '';
+        if (vocab) {
+            newMid = vocab.nextSerial();
+        } else {
+            form.dataset.serial += 1;
+            newMid = form.dataset.serial;
+        }
         const meaningInput = 
         `
-        <div data-id="${newMid}" class="wrapper">
+        <div data-id="${newMid}" class="wrapper form-floating">
+            <input type="text" name="meaning" class="form-control"> 
             <label>meaning</label>
-            <input type="text" name="meaning"> 
+            <i data-id="${newMid}" class="remove material-icons">remove_circle</i>
         </div>
-        <i data-id="${newMid}" class="remove material-icons">remove_circle</i>
         `;
         moreMeaningBtn.insertAdjacentHTML('beforebegin', meaningInput);
         const removeBtn = form.querySelector(`i.remove[data-id="${newMid}"`);
@@ -204,21 +228,25 @@ function meaningSentenceControls(form) {
             newInput.remove();
             removeBtn.remove();
         }, false);
+        floatingInputInit(newInput);
     });
     const moreSentenceBtn = form.querySelector('.moreSentence');
     
     moreSentenceBtn.addEventListener('click', () => {
-        const newSid = (vocab)? 
-            vocab.nextSerial() : 
-            () => ++form.dataset.serial;
-        ;
+        let newSid = '';
+        if (vocab) {
+            newSid = vocab.nextSerial();
+        } else {
+            form.dataset.serial += 1;
+            newSid = form.dataset.serial;
+        }
         const sentenceInput = 
         `
-        <div data-id="${newSid}" class="wrapper">
+        <div data-id="${newSid}" class="wrapper form-floating">
+            <input type="text" name="sentence" class="form-control">
             <label>sentence</label>
-            <input type="text" name="sentence">
+            <i data-id="${newSid}" class="remove material-icons">remove_circle</i>
         </div>
-        <i data-id="${newSid}" class="remove material-icons">remove_circle</i>
         `;
         moreSentenceBtn.insertAdjacentHTML('beforebegin', sentenceInput);
         const removeBtn = form.querySelector(`i.remove[data-id="${newSid}"`);
@@ -229,6 +257,7 @@ function meaningSentenceControls(form) {
             newInput.remove();
             removeBtn.remove();
         }, false);
+        floatingInputInit(newInput);
     });
 
     /* bind existing remove button */
@@ -275,6 +304,11 @@ function editVocabularyControlInit(vocabCard) {
             vocabEditForm.reset();
             vocabEditCard.classList.add('hidden');
         }, false);
+        /* floating input style */
+        const floatings = vocabEditCard.querySelectorAll('.form-floating');
+        floatings.forEach((floating) => {
+            floatingInputInit(floating);
+        });
         /* add more meanings and sentences */
         meaningSentenceControls(vocabEditForm);
     });
@@ -297,6 +331,8 @@ function removeControlInit(vocabCard) {
     control.addEventListener('click', () => {
         dictionary.removeVocabulary(vid);
         vocabCard.remove();
+        const editVocabCard = document.querySelector(`.editVocabularyCard[data-vid="${vid}"]`);
+        editVocabCard.remove();
     }, false);
 }
 
@@ -318,6 +354,25 @@ function initVocabularyControls(vocabCard) {
     learnedControlInit(vocabCard);
 }
 
+/* Check if the form-control element is empty before losing focus (user switch to another section). 
+ * If not empty, keep the floating style. */
+function checkEmpty(control) {
+    const content = control.value;
+    if (content) {
+        control.classList.add('notEmpty');
+    } else {
+        control.classList.remove('notEmpty');
+    }
+}
+
+/* Bind listener for form-floating element. */
+function floatingInputInit(floating) {
+    const control = floating.querySelector('.form-control');
+    checkEmpty(control);
+    control.addEventListener('blur', () => {
+        checkEmpty(control);
+    }, false);
+}
 
 
 /* main */
