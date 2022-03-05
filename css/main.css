@@ -321,6 +321,7 @@ i {
     width: calc(100% - 2.5rem);
     margin: .5rem 0;
     padding: .5rem 1rem;
+    border-radius: .25rem;
     background-color: var(--slate-green-100);
     color: var(--white);
     cursor: pointer;

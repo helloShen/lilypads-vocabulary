@@ -119,7 +119,7 @@ abnormal          [æb'nɔ:məl]           a.  不正常
 const abandon = new Vocabulary('abandon', "[ə'bændən]", ['cease to support or look after (someone); desert.', 'give up completely (a course of action, a practice, or a way of thinking).', 'complete lack of inhibition or restraint.'], ['her natural mother had abandoned her at an early age', 'he had clearly abandoned all pretense of trying to succeed', 'she sings and sways with total abandon']);
 console.log(abandon);
 
-const abashed = new Vocabulary('abashed', '', ['embarrassed, disconcerted, or ashamed.'], ['she was not abashed at being caught']);
+const abashed = new Vocabulary('abashed', "[əˈbaSHt]", ['embarrassed, disconcerted, or ashamed.'], ['she was not abashed at being caught']);
 
 const abate = new Vocabulary('abate', "[ə'beit]", [`
 (of something perceived as hostile, threatening, or negative) become less intense or widespread`], [`
