@@ -38,6 +38,8 @@
 
     --yellow-400: #facc15;
     --shadow: #9ca3afaa;
+    --muted: #00000044;
+    --muted-light: #00000022;
 }
 
 body {
@@ -58,7 +60,7 @@ body {
     font-size: 1.5rem;
     line-height: 1.5rem;
     font-weight: bold;
-    color: var(--white);
+    color: var(--slate-green-100);
 }
 
 .main {
@@ -132,6 +134,10 @@ body {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 2rem;
     gap: .5rem;
+}
+
+.card.muted {
+    background-color: var(--muted-light);
 }
 
 details {
@@ -384,7 +390,7 @@ i {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #00000044;
+    background-color: var(--muted);
     display: grid;
     align-items: center;
     justify-items: center;

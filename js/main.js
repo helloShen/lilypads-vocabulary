@@ -110,19 +110,6 @@ const addFormHtml =
 </div>
 `;
 
-const deleteConfirmHtml = 
-`
-<div class="deleteConfirm">
-    <div class="inner">
-        <p class="text">Are you sure to delete this vocabulary?</p>
-        <div class="btns">
-            <div class="btn confirm">Delete</div>
-            <div class="btn cancel">Cancel</div>
-        </div>
-    <div class="inner">
-</div>
-`;
-
 function clear() {
     const cards = document.querySelectorAll('.vocabulary');
     const editCards = document.querySelectorAll('.editVocabularyCard');
@@ -130,9 +117,22 @@ function clear() {
     editCards.forEach((card) => card.remove());
 }
 
+function displayAllVocabularies() {
+    displayAllVocabulariesAfter(document.querySelector('.addVocabulary'));
+}
+
 function displayAllVocabulariesAfter(marker) {
     clear();
-    dictionary.vocabularies.forEach((v) => {
+    dictionary.vocabularies.filter((v) => v.learned === false && v.important === true).forEach((v) => {
+        marker = displaySingleVocabularyAfter(marker, v);
+    });
+    dictionary.vocabularies.filter((v) => v.learned === false && v.important === false).forEach((v) => {
+        marker = displaySingleVocabularyAfter(marker, v);
+    });
+    dictionary.vocabularies.filter((v) => v.learned === true && v.important === true).forEach((v) => {
+        marker = displaySingleVocabularyAfter(marker, v);
+    });
+    dictionary.vocabularies.filter((v) => v.learned === true && v.important === false).forEach((v) => {
         marker = displaySingleVocabularyAfter(marker, v);
     });
 }
@@ -351,8 +351,22 @@ function importantControlInit(vocabCard) {
     control.addEventListener('click', () => {
         control.classList.toggle('highlight');
         vocab.toggleImportant();
+        displayAllVocabularies();
     }, false);
 }
+
+const deleteConfirmHtml = 
+`
+<div class="deleteConfirm">
+    <div class="inner">
+        <p class="text">Are you sure to delete this vocabulary?</p>
+        <div class="btns">
+            <div class="btn confirm">Delete</div>
+            <div class="btn cancel">Cancel</div>
+        </div>
+    <div class="inner">
+</div>
+`;
 
 function removeControlInit(vocabCard) {
     const vid = vocabCard.dataset.vid;
@@ -373,15 +387,19 @@ function removeControlInit(vocabCard) {
     }, false);
 }
 
-
 function learnedControlInit(vocabCard) {
     const vid = vocabCard.dataset.vid;
     const vocab = dictionary.getVocabulary(vid); 
     const control = vocabCard.querySelector('.learned');
-    if (vocab.getLearned()) control.classList.add('highlight');
+    const innerCard = vocabCard.querySelector('.card');
+    if (vocab.getLearned()) {
+        control.classList.add('highlight');
+        innerCard.classList.toggle('muted');
+    }
     control.addEventListener('click', () => {
         control.classList.toggle('highlight');
         vocab.toggleLearned();
+        displayAllVocabularies();
     }, false);
 }
 
@@ -393,6 +411,7 @@ function initVocabularyControls(vocabCard) {
 }
 
 
+
 /* main */
 addVocabularyInit();
-displayAllVocabulariesAfter(document.querySelector('.addVocabulary'));
+displayAllVocabularies();
