@@ -45,7 +45,7 @@ const templateCard =
 const templateEditCard =
 `
         <div data-vid="{{vid}}" class="formCard editVocabularyCard">
-            <form class="editVocabularyForm">
+            <form class="form editVocabularyForm">
                 <div class="form-floating">
                     <input type="text" name="word" class="form-control" value="{{word}}" required>
                     <label>word</label>
@@ -81,7 +81,7 @@ const templateEditCard =
 const addFormHtml =
 `
 <div class="formCard addVocabularyCard">
-    <form data-serial="2" class="addVocabularyForm">
+    <form data-serial="2" class="form addVocabularyForm">
         <div class="form-floating">
             <input type="text" name="word" class="form-control" required>
             <label>word</label>
@@ -107,6 +107,19 @@ const addFormHtml =
             <button class="cancelAddVocabularyForm">Cancel</button>
         </div>
     </form>
+</div>
+`;
+
+const deleteConfirmHtml = 
+`
+<div class="deleteConfirm">
+    <div class="inner">
+        <p class="text">Are you sure to delete this vocabulary?</p>
+        <div class="btns">
+            <div class="btn confirm">Delete</div>
+            <div class="btn cancel">Cancel</div>
+        </div>
+    <div class="inner">
 </div>
 `;
 
@@ -345,10 +358,21 @@ function removeControlInit(vocabCard) {
     const vid = vocabCard.dataset.vid;
     const control = vocabCard.querySelector('.ctrls > .remove');
     control.addEventListener('click', () => {
-        dictionary.removeVocabulary(vid);
-        vocabCard.remove();
+        vocabCard.insertAdjacentHTML('afterend', deleteConfirmHtml);
+        const deleteConfirm = document.querySelector('.deleteConfirm');
+        const confirmBtn = deleteConfirm.querySelector('.confirm');
+        const cancelBtn = deleteConfirm.querySelector('.cancel');
+        confirmBtn.addEventListener('click', () => {
+            dictionary.removeVocabulary(vid);
+            vocabCard.remove();
+            deleteConfirm.remove();
+        }, false);
+        cancelBtn.addEventListener('click', () => {
+            deleteConfirm.remove();
+        }, false);
     }, false);
 }
+
 
 function learnedControlInit(vocabCard) {
     const vid = vocabCard.dataset.vid;
